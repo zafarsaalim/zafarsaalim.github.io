@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">                                  <head>
+  <meta charset="UTF-8" />                          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Product Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">                                               <style>
+    * {                                                 box-sizing: border-box;
+      margin: 0;                                        padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f9;
+      color: #333;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      color: #111;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: #222;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .buttons a {
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: white;
+      background: #007bff;
+      text-align: center;
+      flex: 1;
+      transition: background 0.3s;
+    }
+
+    .buttons a.view {
+      background: #28a745;
+    }
+
+    .buttons a:hover {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 My Tools & Products</h1>
+  <div class="grid">
+
+    <div class="card">
+      <h2>Simple Invoice Generator</h2>
+      <p>Create invoice summaries and share directly. Lightweight and mobile-ready.</p>
+      <div class="buttons">
+        <a href="https://saalimzafar46.github.io/invoice-tool" target="_blank">Launch</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Quotation Generator</h2>
+      <p>Make itemized quotations in seconds, ready to copy or send via WhatsApp.</p>
+      <div class="buttons">
+        <a href="https://saalimzafar46.github.io/quotegen" target="_blank">Launch</a>
+      </div>
+    </div>
+
+    <!-- Duplicate this .card block for more products -->
+
+  </div>
+</body>
+</html>
