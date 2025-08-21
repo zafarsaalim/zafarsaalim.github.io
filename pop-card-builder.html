@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>POP Card Builder</title>
+  <style>
+    /* —— Base Reset & Layout —— */
+    :root {
+      --brand-red: #e11d48; /* rose-600 */
+      --brand-yellow: #fde047; /* yellow-300 */
+      --ink: #0f172a; /* slate-900 */
+      --muted: #64748b; /* slate-500 */
+      --bg: #f8fafc; /* slate-50 */
+      --card: #ffffff; /* white */
+      --accent: #111827; /* gray-900 for bold text */
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      background: var(--bg); color: var(--ink);
+    }
+    .container { max-width: 1200px; margin: 24px auto; padding: 16px; }
+    .grid { display: grid; grid-template-columns: 380px 1fr; gap: 16px; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+    /* —— Panel Cards —— */
+    .panel { background: var(--card); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(2,8,23,.06); }
+    .panel h2 { margin: 0; padding: 16px 16px 0; font-size: 18px; }
+    .panel .content { padding: 16px; }
+
+    /* —— Form —— */
+    label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 6px; }
+    input[type="text"], input[type="date"], textarea, select {
+      width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px;
+      outline: none; background: #fff;
+    }
+    textarea { resize: vertical; min-height: 68px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btnbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    button, .btn {
+      border: none; background: #111827; color: white; padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer;
+    }
+    button.secondary { background: #334155; }
+    button.ghost { background: transparent; color: #111827; border: 1px solid #e5e7eb; }
+    button.warn { background: var(--brand-red); }
+
+    .note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* —— POP Card Preview —— */
+    .stage { display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .pop-wrap { width: 100%; max-width: 680px; }
+    .pop-card {
+      background: var(--brand-yellow);
+      border-radius: 24px;
+      border: 8px solid var(--accent);
+      overflow: hidden;
+      position: relative;
+    }
+    .pop-header {
+      background: var(--brand-red);
+      color: #fff;
+      padding: 12px 20px;
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: .06em;
+      font-size: clamp(18px, 3vw, 28px);
+    }
+    .pop-body { padding: 20px 24px 28px; }
+    .item-name { font-size: clamp(24px, 4.2vw, 44px); font-weight: 900; color: var(--accent); line-height: 1.05; }
+    .offer { font-size: clamp(22px, 3.6vw, 36px); font-weight: 800; margin-top: 8px; }
+    .price-unit { font-size: clamp(14px, 2.2vw, 18px); font-weight: 700; margin-top: 2px; }
+    .validity { margin-top: 12px; font-size: clamp(13px, 1.8vw, 16px); color: #1f2937; font-weight: 600; }
+
+    .footer-badge { position: absolute; right: 14px; bottom: 12px; font-weight: 800; font-size: 12px; color: #111827; }
+
+    /* —— Record Table —— */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eef2f7; font-size: 13px; }
+    th { background: #f1f5f9; }
+
+    /* —— Print —— */
+    @media print {
+      body { background: white; }
+      .no-print { display: none !important; }
+      .print-target { margin: 0; }
+    }
+    /* Assign @page size dynamically via class switching */
+    .print-A3 { }
+    .print-A4 { }
+    .print-A5 { }
+    .print-A6 { }
+
+    /* Default @page size for printing the preview only */
+    @page { size: auto; margin: 10mm; }
+    /* Size mapping with helper wrappers to control scale */
+    .paper-wrap { padding: 12px; }
+    .paper.A3 { width: 297mm; min-height: 420mm; }
+    .paper.A4 { width: 210mm; min-height: 297mm; }
+    .paper.A5 { width: 148mm; min-height: 210mm; }
+    .paper.A6 { width: 105mm; min-height: 148mm; }
+
+    .paper { background: #fff; border: 1px dashed #e5e7eb; display: flex; align-items: center; justify-content: center; }
+    .paper .pop-wrap { max-width: 90%; }
+    @media print {
+  * {
+    -webkit-print-color-adjust: exact !important; /* Chrome/Safari */
+    print-color-adjust: exact !important;        /* Firefox/Edge */
+    color-adjust: exact !important;              /* legacy */
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="margin:0 0 12px; font-size:22px;">POP Card Builder</h1>
+    <div class="grid">
+      <!-- Input Panel -->
+      <section class="panel no-print">
+        <h2>Promotion Details</h2>
+        <div class="content">
+          <label>Promotion / Item Name</label>
+          <input id="inpName" type="text" placeholder="e.g., AX DAGING TEMPATAN RIBEYE/STRIPLOIN (KG)" />
+
+          <div class="row">
+            <div>
+              <label>Start Date</label>
+              <input id="inpStart" type="date" />
+            </div>
+            <div>
+              <label>End Date</label>
+              <input id="inpEnd" type="date" />
+            </div>
+          </div>
+
+          <label>Offer / Price Details</label>
+          <input id="inpOffer" type="text" placeholder="e.g., ₹269 / kg" />
+
+          <div class="row">
+            <div>
+              <label>Unit / Fine Print (optional)</label>
+              <input id="inpUnit" type="text" placeholder="e.g., Per kg • While stocks last" />
+            </div>
+            <div>
+              <label>SKU / Code (optional)</label>
+              <input id="inpSku" type="text" placeholder="e.g., SKU-CH-001" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Paper / Print Size</label>
+              <select id="paperSize">
+                <option value="A4" selected>A4</option>
+                <option value="A3">A3</option>
+                <option value="A5">A5</option>
+                <option value="A6">A6</option>
+              </select>
+            </div>
+            <div>
+              <label>Header Text</label>
+              <input id="inpHeader" type="text" value="PROMO" />
+            </div>
+          </div>
+
+          <div class="btnbar">
+            <button id="btnAdd">Add to List</button>
+            <button id="btnClear" class="ghost" title="Clear form">Clear</button>
+            <button id="btnPrint" class="secondary" title="Print current card">Print Card</button>
+            <button id="btnHelp" class="ghost">Help</button>
+          </div>
+          <p class="note">This page stores your entries in your browser (localStorage). No server required.</p>
+        </div>
+      </section>
+
+      <!-- Preview / Print Panel -->
+      <section class="panel print-target">
+        <h2 class="no-print">POP Card Preview</h2>
+        <div class="content stage">
+          <div class="paper-wrap">
+            <div id="paper" class="paper A4">
+              <div class="pop-wrap">
+                <div class="pop-card" id="card">
+                  <div class="pop-header" id="cardHeader">PROMO</div>
+                  <div class="pop-body">
+                    <div class="item-name" id="cardName">AX DAGING TEMPATAN RIBEYE/STRIPLOIN (KG)</div>
+                    <div class="offer" id="cardOffer">₹269 / kg</div>
+                    <div class="price-unit" id="cardUnit">Per kg • While stocks last</div>
+                    <div class="validity" id="cardValidity">Valid: 01 Sep 2025 – 15 Sep 2025</div>
+                    <div class="footer-badge" id="cardSku">SKU-CH-001</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Records panel -->
+    <section class="panel no-print" style="margin-top:16px;">
+      <h2>Staged Promotions</h2>
+      <div class="content">
+        <div class="btnbar" style="margin-bottom:8px;">
+          <button id="btnExportCSV">Export CSV</button>
+          <button id="btnExportTXT" class="secondary">Export TXT (| delimited)</button>
+          <button id="btnExportJSON" class="secondary">Export JSON</button>
+          <button id="btnExportSQL" class="secondary" title="Generates INSERT statements you can run manually">Export SQL (.sql)</button>
+          <label class="btn ghost" for="fileImport" style="display:inline-flex; align-items:center; gap:8px;">Import…<input id="fileImport" type="file" accept=".csv,.json,.txt" style="display:none"></label>
+          <button id="btnClearList" class="warn">Clear List</button>
+        </div>
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Promo Name</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Offer</th>
+              <th>Unit</th>
+              <th>SKU</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p class="note">Tip: Use “Export SQL” to download ready-to-run <code>INSERT</code> statements. Adjust table/column names at the top of the file.</p>
+      </div>
+    </section>
+
+    <!-- Help modal (simple) -->
+    <div id="help" class="no-print" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,.6); align-items:center; justify-content:center;">
+      <div class="panel" style="max-width:720px; width:92%;">
+        <div class="content">
+          <h3 style="margin:0 0 8px">How to use</h3>
+          <ol style="margin:0 0 8px 18px;">
+            <li>Enter promotion details in the left panel. Preview updates live.</li>
+            <li>Pick the paper size (A3/A4/A5/A6). Click <b>Print Card</b> to print or save as PDF.</li>
+            <li>Click <b>Add to List</b> to stage multiple promotions.</li>
+            <li>Use <b>Export</b> buttons to download CSV/TXT/JSON or a SQL script with INSERT statements.</li>
+            <li>Use <b>Import…</b> to load CSV/JSON/TXT back into the list.</li>
+          </ol>
+          <p class="note">You can edit table/column names in the SQL export file header comments. All data stays in your browser until you export.</p>
+          <div class="btnbar"><button class="ghost" onclick="toggleHelp(false)">Close</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // —— Utilities ——
+    const $ = (sel) => document.querySelector(sel);
+    const fmtDate = (iso) => {
+      if (!iso) return "";
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d)) return iso;
+      return d.toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' });
+    };
+
+    // —— State ——
+    const state = {
+      list: JSON.parse(localStorage.getItem('promos.list') || '[]'),
+      table: 'Promotions',
+      columns: ['PromoName','StartDate','EndDate','Offer','Unit','SKU']
+    };
+
+    // —— Bind Inputs to Preview ——
+    function updatePreview(){
+      const name = $('#inpName').value.trim() || 'AX DAGING TEMPATAN RIBEYE/STRIPLOIN (KG)';
+      const offer = $('#inpOffer').value.trim() || '₹269 / kg';
+      const unit = $('#inpUnit').value.trim() || 'Per kg • While stocks last';
+      const sku = $('#inpSku').value.trim() || 'SKU-CH-001';
+      const start = $('#inpStart').value; const end = $('#inpEnd').value;
+      const header = $('#inpHeader').value.trim() || 'PROMO';
+      $('#cardHeader').textContent = header;
+      $('#cardName').textContent = name;
+      $('#cardOffer').textContent = offer;
+      $('#cardUnit').textContent = unit;
+      $('#cardSku').textContent = sku;
+      let validity = '';
+      if (start || end) validity = `Valid: ${fmtDate(start)}${start && end ? ' – ' : ''}${fmtDate(end)}`;
+      $('#cardValidity').textContent = validity || ' ';
+    }
+
+    ['#inpName','#inpOffer','#inpUnit','#inpSku','#inpStart','#inpEnd','#inpHeader']
+      .forEach(id => $(id).addEventListener('input', updatePreview));
+
+    // Paper size handling (for print/PDF)
+    $('#paperSize').addEventListener('change', (e)=>{
+      const size = e.target.value;
+      const paper = $('#paper');
+      paper.className = `paper ${size}`; // sets A3/A4/A5/A6 class
+    });
+
+    // Init default dates (today -> +14 days)
+    (function initDefaults(){
+      const t = new Date();
+      const plus = new Date(Date.now()+ 14*24*3600*1000);
+      $('#inpStart').value = t.toISOString().slice(0,10);
+      $('#inpEnd').value = plus.toISOString().slice(0,10);
+      updatePreview();
+      renderTable();
+    })();
+
+    // —— Add to List ——
+    $('#btnAdd').addEventListener('click', ()=>{
+      const rec = {
+        name: $('#inpName').value.trim(),
+        start: $('#inpStart').value,
+        end: $('#inpEnd').value,
+        offer: $('#inpOffer').value.trim(),
+        unit: $('#inpUnit').value.trim(),
+        sku: $('#inpSku').value.trim(),
+        header: $('#inpHeader').value.trim() || 'PROMO',
+        paper: $('#paperSize').value
+      };
+      // Basic validation
+      if(!rec.name){ alert('Promotion/Item Name is required.'); return; }
+      state.list.push(rec);
+      persist();
+      renderTable();
+    });
+
+    $('#btnClear').addEventListener('click', ()=>{
+      ['#inpName','#inpOffer','#inpUnit','#inpSku'].forEach(id => $(id).value='');
+      updatePreview();
+    });
+
+    function persist(){ localStorage.setItem('promos.list', JSON.stringify(state.list)); }
+
+    // —— Table Render & row actions ——
+    function renderTable(){
+      const tbody = $('#tbl tbody');
+      tbody.innerHTML = '';
+      state.list.forEach((r, i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.start)}</td>
+          <td>${escapeHtml(r.end)}</td>
+          <td>${escapeHtml(r.offer)}</td>
+          <td>${escapeHtml(r.unit)}</td>
+          <td>${escapeHtml(r.sku)}</td>
+          <td>
+            <button class="ghost" data-act="load" data-idx="${i}">Load</button>
+            <button class="ghost" data-act="dup" data-idx="${i}">Dup</button>
+            <button class="warn" data-act="del" data-idx="${i}">Del</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+      tbody.querySelectorAll('button').forEach(btn=>btn.addEventListener('click', rowAction));
+    }
+
+    function rowAction(e){
+      const idx = +e.target.dataset.idx;
+      const act = e.target.dataset.act;
+      const r = state.list[idx];
+      if(act==='load'){
+        $('#inpName').value = r.name || '';
+        $('#inpStart').value = r.start || '';
+        $('#inpEnd').value = r.end || '';
+        $('#inpOffer').value = r.offer || '';
+        $('#inpUnit').value = r.unit || '';
+        $('#inpSku').value = r.sku || '';
+        $('#inpHeader').value = r.header || 'PROMO';
+        $('#paperSize').value = r.paper || 'A4';
+        $('#paper').className = `paper ${$('#paperSize').value}`;
+        updatePreview();
+      }
+      if(act==='dup'){
+        state.list.splice(idx+1, 0, Object.assign({}, r));
+        persist(); renderTable();
+      }
+      if(act==='del'){
+        if(confirm('Delete this promotion?')){ state.list.splice(idx,1); persist(); renderTable(); }
+      }
+    }
+
+    $('#btnClearList').addEventListener('click', ()=>{
+      if(confirm('Clear all staged promotions?')){ state.list = []; persist(); renderTable(); }
+    });
+
+    // —— Printing ——
+    $('#btnPrint').addEventListener('click', ()=>{
+      window.print();
+    });
+
+    // —— Help ——
+    function toggleHelp(show){ $('#help').style.display = show ? 'flex':'none'; }
+    $('#btnHelp').addEventListener('click', ()=>toggleHelp(true));
+
+    // —— Exporters ——
+    function download(filename, text){
+      const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function toCSV(list){
+      const header = ['PromoName','StartDate','EndDate','Offer','Unit','SKU'];
+      const rows = list.map(r=>[
+        csvEscape(r.name), csvEscape(r.start), csvEscape(r.end), csvEscape(r.offer), csvEscape(r.unit), csvEscape(r.sku)
+      ].join(','));
+      return header.join(',') + "\n" + rows.join("\n");
+    }
+
+    function toPipe(list){
+      const header = ['PromoName','StartDate','EndDate','Offer','Unit','SKU'].join('|');
+      const rows = list.map(r=>[
+        pipeEscape(r.name), pipeEscape(r.start), pipeEscape(r.end), pipeEscape(r.offer), pipeEscape(r.unit), pipeEscape(r.sku)
+      ].join('|'));
+      return header + "\n" + rows.join("\n");
+    }
+
+    function toJSON(list){ return JSON.stringify(list, null, 2); }
+
+    function toSQL(list){
+      const table = state.table;
+      const cols = state.columns;
+      const header = `-- SQL Export generated by POP Card Builder\n-- Edit table/column names if needed. Run with your SQL client.\n\nCREATE TABLE IF NOT EXISTS ${table} (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  ${cols[0]} TEXT NOT NULL,\n  ${cols[1]} DATE,\n  ${cols[2]} DATE,\n  ${cols[3]} TEXT,\n  ${cols[4]} TEXT,\n  ${cols[5]} TEXT\n);\n\n`;
+      const values = list.map(r=>{
+        const vals = [r.name, r.start, r.end, r.offer, r.unit, r.sku]
+          .map(v=>v==null?null:v.toString());
+        return `INSERT INTO ${table} (${cols.join(',')}) VALUES (${vals.map(sqlQuote).join(',')});`;
+      }).join("\n");
+      return header + values + "\n";
+    }
+
+    $('#btnExportCSV').addEventListener('click', ()=>{
+      if(!state.list.length) return alert('No promotions to export. Add to list first.');
+      download('promotions.csv', toCSV(state.list));
+    });
+    $('#btnExportTXT').addEventListener('click', ()=>{
+      if(!state.list.length) return alert('No promotions to export. Add to list first.');
+      download('promotions.txt', toPipe(state.list));
+    });
+    $('#btnExportJSON').addEventListener('click', ()=>{
+      if(!state.list.length) return alert('No promotions to export. Add to list first.');
+      download('promotions.json', toJSON(state.list));
+    });
+    $('#btnExportSQL').addEventListener('click', ()=>{
+      if(!state.list.length) return alert('No promotions to export. Add to list first.');
+      download('promotions.sql', toSQL(state.list));
+    });
+
+    // —— Import (CSV/JSON/TXT) ——
+    $('#fileImport').addEventListener('change', async (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const text = await file.text();
+      let imported = [];
+      if(file.name.endsWith('.json')){
+        try { imported = JSON.parse(text); } catch { alert('Invalid JSON'); return; }
+      } else if (file.name.endsWith('.csv')){
+        imported = fromCSV(text);
+      } else { // treat as pipe-delimited
+        imported = fromPipe(text);
+      }
+      if(!Array.isArray(imported)) { alert('Unsupported format content.'); return; }
+      // Normalize keys if coming from JSON
+      imported = imported.map(n => ({
+        name: n.name || n.PromoName || n.promoName || '',
+        start: n.start || n.StartDate || n.startDate || '',
+        end: n.end || n.EndDate || n.endDate || '',
+        offer: n.offer || n.Offer || '',
+        unit: n.unit || n.Unit || '',
+        sku: n.sku || n.SKU || n.Sku || ''
+      }));
+      state.list = state.list.concat(imported.filter(x=>x.name));
+      persist(); renderTable();
+      e.target.value = '';
+    });
+
+    // —— CSV/TXT helpers ——
+    function csvEscape(v){
+      if(v==null) return '';
+      const s = String(v);
+      return /[",\n]/.test(s) ? '"' + s.replaceAll('"','""') + '"' : s;
+    }
+    function pipeEscape(v){ return (v==null)?'': String(v).replaceAll('|','/'); }
+    function fromCSV(text){
+      const lines = text.trim().split(/\r?\n/);
+      const head = lines.shift().split(',').map(h=>h.replace(/^\"|\"$/g,''));
+      const idx = {
+        name: head.findIndex(h=>/promoname/i.test(h)),
+        start: head.findIndex(h=>/startdate/i.test(h)),
+        end:   head.findIndex(h=>/enddate/i.test(h)),
+        offer: head.findIndex(h=>/offer/i.test(h)),
+        unit:  head.findIndex(h=>/unit/i.test(h)),
+        sku:   head.findIndex(h=>/^sku$/i.test(h)),
+      };
+      return lines.map(line=>{
+        const cells = parseCSVRow(line);
+        return {
+          name: cells[idx.name] || '',
+          start: cells[idx.start] || '',
+          end: cells[idx.end] || '',
+          offer: cells[idx.offer] || '',
+          unit: cells[idx.unit] || '',
+          sku: cells[idx.sku] || ''
+        };
+      });
+    }
+    function fromPipe(text){
+      const lines = text.trim().split(/\r?\n/);
+      const head = lines.shift().split('|');
+      const key = (k)=> head.findIndex(h=>h.toLowerCase()===k.toLowerCase());
+      return lines.map(line=>{
+        const c = line.split('|');
+        return { name: c[key('PromoName')]||'', start: c[key('StartDate')]||'', end: c[key('EndDate')]||'', offer: c[key('Offer')]||'', unit: c[key('Unit')]||'', sku: c[key('SKU')]||'' };
+      });
+    }
+    function parseCSVRow(line){
+      // Simple CSV parser (handles quotes/commas)
+      const out = []; let cur = ''; let q=false;
+      for(let i=0;i<line.length;i++){
+        const ch=line[i];
+        if(q){
+          if(ch==='"' && line[i+1]==='"'){ cur+='"'; i++; }
+          else if(ch==='"'){ q=false; }
+          else cur+=ch;
+        } else {
+          if(ch==='"') q=true;
+          else if(ch===','){ out.push(cur); cur=''; }
+          else cur+=ch;
+        }
+      }
+      out.push(cur);
+      return out;
+    }
+
+    // —— SQL quoting ——
+    function sqlQuote(v){
+      if(v==null || v==='') return 'NULL';
+      return '\'' + String(v).replaceAll("'","''") + '\'';
+    }
+
+    // —— Security helpers ——
+    function escapeHtml(s){
+      return String(s==null?'':s)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
+  </script>
+</body>
+</html>
