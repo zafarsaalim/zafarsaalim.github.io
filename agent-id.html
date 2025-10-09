@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Images</title>
+<style>
+  body {
+    margin: 0;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+    background: #000;
+  }
+
+  section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start;
+  }
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+</style>
+</head>
+<body>
+
+<section>
+  <img src="b.jpg" alt="">
+</section>
+
+<section>
+  <img src="a.jpg" alt="">
+</section>
+
+<section>
+  <img src="c.jpg" alt="">
+</section>
+
+</body>
+</html>
