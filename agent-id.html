@@ -7,24 +7,26 @@
 <style>
   body {
     margin: 0;
-    scroll-snap-type: y mandatory;
-    overflow-y: scroll;
-    height: 100vh;
+    padding: 20px;
     background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;           /* space between images */
+    overflow-y: auto;    /* normal scroll */
   }
 
   section {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    scroll-snap-align: start;
+    height: auto;        /* let the section fit the image */
+    display: block;      /* standard block layout */
   }
 
   img {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 90%;
+    height: auto;
     object-fit: contain;
+    border-radius: 10px; /* optional for nicer look */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 </style>
 </head>
@@ -41,6 +43,9 @@
 <section>
   <img src="c.jpg" alt="">
 </section>
+
+<!-- Include your ga.js script -->
+<script src="ga.js"></script>
 
 </body>
 </html>
