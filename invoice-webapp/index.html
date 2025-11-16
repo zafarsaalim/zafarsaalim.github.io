@@ -5,250 +5,177 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Invoice Form</title>
 
+  <!-- MANDATORY for Telegram -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
-    body { font-family:-apple-system,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; padding:18px; }
+    body { font-family: Arial; padding:18px; }
     h2 { margin-top:0; }
     .row { display:flex; gap:8px; margin-bottom:8px; }
     .col { flex:1; display:flex; flex-direction:column; }
-    label { font-size:12px; margin-bottom:4px; }
-    input, textarea, select { padding:8px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
-    textarea { min-height:60px; }
-    .btn { padding:10px 12px; border-radius:8px; border:none; font-weight:600; cursor:pointer; }
+    input, textarea { padding:8px; border:1px solid #ddd; border-radius:6px; }
+    .btn { padding:10px; border-radius:8px; cursor:pointer; }
     .btn-primary { background:#3b82f6; color:white; }
-    .btn-ghost { background:#f3f4f6; }
-    table { width:100%; border-collapse:collapse; margin-bottom:8px; }
-    th, td { border:1px solid #e5e7eb; padding:8px; font-size:14px; }
-    .actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
-    .footer { margin-top:12px; font-size:12px; text-align:center; }
+    .btn-ghost { background:#eee; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th, td { border:1px solid #ccc; padding:8px; font-size:14px; }
   </style>
 </head>
-
 <body>
+
 <h2>Invoice Form</h2>
 
-<!-- SELLER -->
+<!-- Seller -->
 <div>
-  <strong>Seller</strong>
+  <b>Seller</b>
   <div class="row">
-    <div class="col">
-      <label>Seller Name</label>
-      <input id="seller_name" placeholder="ABC Traders">
-    </div>
-    <div class="col">
-      <label>Phone</label>
-      <input id="seller_phone" placeholder="9988776655">
-    </div>
+    <div class="col"><input id="seller_name" placeholder="Seller Name"></div>
+    <div class="col"><input id="seller_phone" placeholder="Phone"></div>
   </div>
-
-  <label>Address</label>
-  <textarea id="seller_address" placeholder="123 Market Road, City - PIN"></textarea>
-
+  <textarea id="seller_address" placeholder="Address"></textarea>
   <div class="row">
-    <div class="col">
-      <label>GST (optional)</label>
-      <input id="seller_gst" placeholder="27ABCDE1234F1Z2">
-    </div>
-    <div class="col">
-      <label>Logo URL</label>
-      <input id="logo_url" placeholder="https://...">
-    </div>
+    <div class="col"><input id="seller_gst" placeholder="GST"></div>
+    <div class="col"><input id="logo_url" placeholder="Logo URL"></div>
   </div>
 </div>
 
 <hr>
 
-<!-- BUYER -->
+<!-- Buyer -->
 <div>
-  <strong>Buyer</strong>
+  <b>Buyer</b>
   <div class="row">
-    <div class="col">
-      <label>Buyer Name</label>
-      <input id="buyer_name" placeholder="John Enterprises">
-    </div>
-    <div class="col">
-      <label>Phone</label>
-      <input id="buyer_phone" placeholder="Phone">
-    </div>
+    <div class="col"><input id="buyer_name" placeholder="Buyer Name"></div>
+    <div class="col"><input id="buyer_phone" placeholder="Phone"></div>
   </div>
-
-  <label>Address</label>
-  <textarea id="buyer_address" placeholder="22 Park Street, City - PIN"></textarea>
-
+  <textarea id="buyer_address" placeholder="Address"></textarea>
   <div class="row">
-    <div class="col">
-      <label>GST</label>
-      <input id="buyer_gst" placeholder="GSTIN">
-    </div>
-    <div class="col">
-      <label>Currency</label>
-      <input id="currency" value="INR">
-    </div>
+    <div class="col"><input id="buyer_gst" placeholder="GST"></div>
+    <div class="col"><input id="currency" value="INR"></div>
   </div>
 </div>
 
 <hr>
 
-<!-- INVOICE -->
+<!-- Invoice -->
 <div>
-  <strong>Invoice</strong>
+  <b>Invoice</b>
   <div class="row">
-    <div class="col">
-      <label>Invoice Number</label>
-      <input id="invoice_no" placeholder="INV-2025-001">
-    </div>
-    <div class="col">
-      <label>Invoice Date</label>
-      <input id="invoice_date" type="date">
-    </div>
-    <div class="col">
-      <label>Due Date</label>
-      <input id="due_date" type="date">
-    </div>
+    <div class="col"><input id="invoice_no" placeholder="Invoice No"></div>
+    <div class="col"><input id="invoice_date" type="date"></div>
+    <div class="col"><input id="due_date" type="date"></div>
   </div>
-
   <div class="row">
-    <div class="col">
-      <label>Tax %</label>
-      <input id="tax_percent" type="number" value="0">
-    </div>
-    <div class="col">
-      <label>Notes</label>
-      <input id="notes" placeholder="Payment due in 7 days">
-    </div>
+    <div class="col"><input id="tax_percent" type="number" value="0" placeholder="Tax %"></div>
+    <div class="col"><input id="notes" placeholder="Notes"></div>
   </div>
 </div>
 
 <hr>
 
 <!-- ITEMS -->
-<div>
-  <strong>Items</strong>
-  <table id="items_table">
-    <thead><tr><th>#</th><th>Description</th><th>Qty</th><th>Unit Price</th><th></th></tr></thead>
-    <tbody></tbody>
-  </table>
+<b>Items</b>
 
-  <div class="row">
-    <input id="it_name" placeholder="Item description">
-    <input id="it_qty" type="number" placeholder="Qty" style="width:90px">
-    <input id="it_price" type="number" placeholder="Unit price" style="width:130px">
-    <button id="add_item" class="btn btn-ghost">Add</button>
-  </div>
+<table>
+  <thead>
+    <tr><th>#</th><th>Description</th><th>Qty</th><th>Price</th><th></th></tr>
+  </thead>
+  <tbody id="items_body"></tbody>
+</table>
+
+<div class="row">
+  <input id="it_name" placeholder="Item name">
+  <input id="it_qty" type="number" placeholder="Qty">
+  <input id="it_price" type="number" placeholder="Price">
+  <button class="btn btn-ghost" id="add_item">Add</button>
 </div>
 
-<div class="actions">
-  <button id="submit" class="btn btn-primary">Submit Invoice</button>
-</div>
+<br>
 
-<div class="footer">This form runs inside Telegram WebApp</div>
+<button id="submit" class="btn btn-primary">Submit Invoice</button>
 
 <script>
-// --- TELEGRAM WEBAPP INITIALIZATION ---
-let tg = window.Telegram.WebApp || null;
-if (tg) {
-    tg.ready();       // REQUIRED
-    tg.expand();      // optional
-}
+const tg = window.Telegram.WebApp;
+tg.ready();       // VERY IMPORTANT
+tg.expand();      // Optional
 
-// --- HELPERS ---
-function $(id){ return document.getElementById(id); }
+function $(id) { return document.getElementById(id); }
 
 let items = [];
-const tbody = document.querySelector('#items_table tbody');
 
-// Escape text for table
-function escapeHtml(s){
-  return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-// Refresh items table
-function refreshItems(){
-  tbody.innerHTML = "";
-  items.forEach((it, i)=>{
-    let tr = document.createElement("tr");
-    tr.innerHTML = `
+function refreshTable() {
+  const body = $("items_body");
+  body.innerHTML = "";
+  items.forEach((it, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
       <td>${i+1}</td>
-      <td>${escapeHtml(it.name)}</td>
+      <td>${it.name}</td>
       <td>${it.qty}</td>
-      <td>${it.price.toFixed(2)}</td>
-      <td><button class="del" data-i="${i}">Delete</button></td>`;
-    tbody.appendChild(tr);
+      <td>${it.price}</td>
+      <td><button data-i="${i}" class="del">X</button></td>
+    `;
+    body.appendChild(row);
   });
 
   document.querySelectorAll(".del").forEach(btn=>{
-    btn.onclick = ()=>{ items.splice(Number(btn.dataset.i),1); refreshItems(); };
+    btn.onclick = () => {
+      items.splice(btn.dataset.i, 1);
+      refreshTable();
+    };
   });
 }
 
-// Popup handler
-function showMessage(msg){
-  if (tg) tg.showPopup({message: msg});
-  else alert(msg);
-}
+$("add_item").onclick = () => {
+  const name = $("it_name").value.trim();
+  const qty  = Number($("it_qty").value);
+  const price = Number($("it_price").value);
 
-// --- ADD ITEM ---
-$('add_item').onclick = ()=>{
-  let name = $('it_name').value.trim();
-  let qty = Number($('it_qty').value);
-  let price = Number($('it_price').value);
+  if (!name || qty <= 0 || price <= 0) {
+    alert("Invalid item");
+    return;
+  }
 
-  if (!name) return showMessage("Enter item description");
-  if (!qty || qty <= 0) return showMessage("Enter valid quantity");
-  if (isNaN(price)) return showMessage("Enter valid price");
+  items.push({ name, qty, price });
 
-  items.push({name, qty, price});
-  $('it_name').value = "";
-  $('it_qty').value = "";
-  $('it_price').value = "";
+  $("it_name").value = "";
+  $("it_qty").value = "";
+  $("it_price").value = "";
 
-  refreshItems();
+  refreshTable();
 };
 
-// --- SUBMIT ---
-$('submit').onclick = ()=>{
-
-  if (!$('seller_name').value.trim()) return showMessage("Enter seller name");
-  if (!$('seller_address').value.trim()) return showMessage("Enter seller address");
-  if (!$('buyer_name').value.trim()) return showMessage("Enter buyer name");
-  if (!$('invoice_no').value.trim()) return showMessage("Enter invoice number");
-
-  const data = {
-    seller:{
-      name: $('seller_name').value.trim(),
-      address: $('seller_address').value.trim(),
-      phone: $('seller_phone').value.trim(),
-      gst: $('seller_gst').value.trim()
+$("submit").onclick = () => {
+  const payload = {
+    seller: {
+      name: $("seller_name").value,
+      address: $("seller_address").value,
+      phone: $("seller_phone").value,
+      gst: $("seller_gst").value
     },
-    buyer:{
-      name: $('buyer_name').value.trim(),
-      address: $('buyer_address').value.trim(),
-      phone: $('buyer_phone').value.trim(),
-      gst: $('buyer_gst').value.trim()
+    buyer: {
+      name: $("buyer_name").value,
+      address: $("buyer_address").value,
+      phone: $("buyer_phone").value,
+      gst: $("buyer_gst").value
     },
-    invoice:{
-      number: $('invoice_no').value.trim(),
-      date: $('invoice_date').value || new Date().toISOString().slice(0,10),
-      due_date: $('due_date').value,
-      tax_percent: Number($('tax_percent').value),
-      currency: $('currency').value || "INR"
+    invoice: {
+      number: $("invoice_no").value,
+      date: $("invoice_date").value,
+      due_date: $("due_date").value,
+      tax_percent: Number($("tax_percent").value),
+      currency: $("currency").value
     },
     items: items,
-    notes: $('notes').value.trim(),
-    logo_url: $('logo_url').value.trim()
+    notes: $("notes").value,
+    logo_url: $("logo_url").value
   };
 
-  const jsonStr = JSON.stringify(data);
-
-  if (tg && tg.sendData){
-    tg.sendData(jsonStr);
-    setTimeout(()=>tg.close(), 200);
-  } else {
-    console.log("payload:", data);
-    alert("Not inside Telegram WebApp. Open from bot button.");
-  }
+  tg.sendData(JSON.stringify(payload));
+  tg.close();
 };
 
-refreshItems();
 </script>
+
 </body>
 </html>
